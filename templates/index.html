@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Static Hosting on S3</title>
+  <!-- Link to external CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script>
+    async function createBucket() {
+      const bucketName = document.getElementById("bucketName").value;
+      if (!bucketName) {
+        alert("Please enter a bucket name!");
+        return;
+      }
+
+      const response = await fetch("/create_bucket", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bucket_name: bucketName }),
+      });
+
+      const data = await response.json();
+      alert(data.message || data.error);
+
+      if (response.ok) {
+        loadBuckets();
+      }
+    }
+
+    async function loadBuckets() {
+      const response = await fetch("/list_buckets");
+      const data = await response.json();
+      const bucketSelect = document.getElementById("bucketSelect");
+
+      // Clear existing options
+      bucketSelect.innerHTML = "";
+
+      if (response.ok) {
+        data.buckets.forEach((bucket) => {
+          const option = document.createElement("option");
+          option.value = bucket;
+          option.textContent = bucket;
+          bucketSelect.appendChild(option);
+        });
+      } else {
+        alert(data.error);
+      }
+    }
+
+    async function uploadFiles() {
+      const bucketName = document.getElementById("bucketSelect").value;
+      const files = document.getElementById("files").files;
+      if (!bucketName || files.length === 0) {
+        alert("Please select a bucket and files to upload!");
+        return;
+      }
+
+      console.log("Bucket Name:", bucketName);
+      console.log("Files:", files);
+
+      const formData = new FormData();
+      for (const file of files) {
+        formData.append("files", file);
+      }
+      formData.append("bucket_name", bucketName);
+
+      try {
+        const response = await fetch("/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+        console.log("Response Data:", data);
+
+        // Display the S3 URL below the Host button
+        const resultContainer = document.getElementById("result");
+        if (response.ok) {
+          resultContainer.innerHTML = `<a href="${data.url}" target="_blank">Your site is live! Click here to access it.</a>`;
+        } else {
+          resultContainer.innerHTML = `Error: ${data.error}`;
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred while uploading files.");
+      }
+    }
+
+    // Load buckets on page load
+    window.onload = loadBuckets;
+  </script>
+</head>
+<body>
+  <h1>Static Hosting on S3</h1>
+
+  <section>
+    <h2>Create a Bucket</h2>
+    <input type="text" id="bucketName" placeholder="Enter bucket name">
+    <button onclick="createBucket()">Create Bucket</button>
+  </section>
+
+  <section>
+    <h2>Upload Files</h2>
+    <input type="file" id="files" multiple>
+    <select id="bucketSelect"></select>
+    <button onclick="uploadFiles()">Host</button>
+  </section>
+
+  <!-- Space for displaying the URL -->
+  <p id="result"></p>
+</body>
+</html>
