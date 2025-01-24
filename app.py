@@ -141,7 +141,8 @@ def upload_files():
             s3_bucket.put_object(
                 Key=file.filename,
                 Body=file,
-                ContentType=content_type  # Set Content-Type metadata
+                ContentType=content_type,
+                CacheControl="no-cache, no-store, must-revalidate"
             )
             print(f"File {file.filename} uploaded successfully.")
 
