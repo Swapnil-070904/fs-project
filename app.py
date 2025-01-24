@@ -114,23 +114,23 @@ def upload_files():
         s3_bucket = s3_resource.Bucket(bucket_name)
 
         # Retry mechanism to wait until the bucket exists
-        max_retries = 10
-        for attempt in range(max_retries):
-            try:
-                print(f"Attempting to access bucket: {bucket_name}")
-                s3_client.head_bucket(Bucket=bucket_name)
-                print(f"Bucket {bucket_name} is accessible.")
-                break
-            except s3_client.exceptions.NoSuchBucket:
-                print(f"Bucket {bucket_name} does not exist, attempt {attempt + 1}")
-                if attempt < max_retries - 1:
-                    time.sleep(2 ** attempt)  # Exponential backoff
-                else:
-                    print(f"Final attempt: Bucket {bucket_name} not accessible.")
-                    return jsonify({'error': 'Bucket does not exist or is not accessible'}), 500
-            except Exception as e:
-                print(f"Error accessing bucket {bucket_name}: {str(e)}")
-                return jsonify({'error': f"Error accessing bucket {bucket_name}: {str(e)}"}), 500
+        # max_retries = 10
+        # for attempt in range(max_retries):
+        #     try:
+        #         print(f"Attempting to access bucket: {bucket_name}")
+        #         s3_client.head_bucket(Bucket=bucket_name)
+        #         print(f"Bucket {bucket_name} is accessible.")
+        #         break
+        #     except s3_client.exceptions.NoSuchBucket:
+        #         print(f"Bucket {bucket_name} does not exist, attempt {attempt + 1}")
+        #         if attempt < max_retries - 1:
+        #             time.sleep(2 ** attempt)  # Exponential backoff
+        #         else:
+        #             print(f"Final attempt: Bucket {bucket_name} not accessible.")
+        #             return jsonify({'error': 'Bucket does not exist or is not accessible'}), 500
+        #     except Exception as e:
+        #         print(f"Error accessing bucket {bucket_name}: {str(e)}")
+        #         return jsonify({'error': f"Error accessing bucket {bucket_name}: {str(e)}"}), 500
 
         # Upload files to the specified bucket with proper Content-Type
         for file in files:
