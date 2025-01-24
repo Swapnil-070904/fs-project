@@ -6,6 +6,7 @@
   <title>Static Hosting on S3</title>
   <!-- Link to external CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
   <script>
     async function createBucket() {
       const bucketName = document.getElementById("bucketName").value;
@@ -77,7 +78,7 @@
         // Display the S3 URL below the Host button
         const resultContainer = document.getElementById("result");
         if (response.ok) {
-          resultContainer.innerHTML = `<a href="${data.url}" target="_blank">Your site is live! Click here to access it.</a>`;
+          resultContainer.innerHTML = `<a href="${data.url}" target="_blank">Your site is live!! Click here to access it.</a>`;
         } else {
           resultContainer.innerHTML = `Error: ${data.error}`;
         }
@@ -92,7 +93,7 @@
   </script>
 </head>
 <body>
-  <h1>Static Hosting on S3</h1>
+  <h1>Host For Free</h1>
 
   <section>
     <h2>Create a Bucket</h2>
